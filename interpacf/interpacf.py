@@ -4,9 +4,9 @@ missing data.
 """
 from __future__ import print_function, absolute_import, division
 
+import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy import signal
-import numpy as np
 
 __all__ = ["interpolated_acf", "autocorrelation", "interpolate_missing_data",
            "dominant_period"]
@@ -101,9 +101,10 @@ def interpolated_acf(times, fluxes):
     return lag, acf
 
 
-def dominant_period(lag, acf, min=None, max=None, plot=False):
+def dominant_period(lag, acf, min=None, max=None, fwhm=18, window=56,
+                    plot=False):
     """
-    Find the dominant period in the autocorrelation function.
+    Find the dominant period in the smoothed autocorrelation function.
 
     Parameters
     ----------
@@ -112,16 +113,26 @@ def dominant_period(lag, acf, min=None, max=None, plot=False):
     acf : numpy.ndarray
         Autocorrelation function
     min : float (optional)
-        Return dominant period greater than ``min``
+        Return dominant period greater than ``min``. Default is no limit.
     max : float (optional)
-        Return dominant period less than ``max``
+        Return dominant period less than ``max``. Default is no limit.
+    fwhm : float (optional)
+        Full-width at half max [lags] of the gaussian smoothing kernel. Default
+        is 18 lags, as in McQuillan, Aigrain & Mazeh (2013) [1]_
+    window : float (optional)
+        Truncate the gaussian smoothing kernel after ``window`` lags. Default
+        is 56 lags, as in McQuillan, Aigrain & Mazeh (2013) [1]_
     plot : bool (optional)
-        Plot the autocorrelation function, peak detected
+        Plot the autocorrelation function, peak detected. Default is `False`.
 
     Return
     ------
     acf_period : float
         Dominant period detected via the autocorrelation function
+
+    References
+    ----------
+    .. [1] http://adsabs.harvard.edu/abs/2013MNRAS.432.1203M
     """
     lag_limited = np.copy(lag)
     acf_limited = np.copy(acf)
@@ -137,12 +148,18 @@ def dominant_period(lag, acf, min=None, max=None, plot=False):
         acf_limited = acf_limited[(lag_limited < max) & (lag_limited > min)]
         lag_limited = lag_limited[(lag_limited < max) & (lag_limited > min)]
 
-    smooth_acf = gaussian_filter(acf_limited, 10)
+    # Convert fwhm -> sigma, convolve with gaussian kernel
+    sigma = fwhm/2.355
+    truncate = window/sigma
+    smooth_acf = gaussian_filter(acf_limited, sigma, truncate=truncate)
+
+    # Detect peaks
     relative_maxes = signal.argrelmax(smooth_acf)[0]
     if len(relative_maxes) == 0:
         raise ValueError("No period found. Be sure to check limits and to "
                          "median-subtract your fluxes.")
 
+    # Detect highest peak
     absolute_max_index = relative_maxes[np.argmax(smooth_acf[relative_maxes])]
     acf_period = lag_limited[absolute_max_index]
 
