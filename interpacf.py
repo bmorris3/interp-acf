@@ -8,7 +8,8 @@ from scipy.ndimage import gaussian_filter
 from scipy import signal
 import numpy as np
 
-__all__ = ["interpolated_acf", "autocorrelation", "interpolate_missing_data"]
+__all__ = ["interpolated_acf", "autocorrelation", "interpolate_missing_data",
+           "dominant_period"]
 __version__ = "0.1"
 __author__ = "Brett Morris (bmmorris@uw.edu)"
 
@@ -62,13 +63,13 @@ def interpolate_missing_data(times, fluxes):
 
 def autocorrelation(x):
     """
-    Calculate the autocorrelation function of array ``x``
+    Calculate the autocorrelation function of array ``x``.
     """
     result = np.correlate(x, x, mode='full')
     return result[result.size//2:]
 
 
-def interpolated_acf(times, fluxes, plots=False):
+def interpolated_acf(times, fluxes):
     """
     Calculate the autocorrelation function after interpolating over
     missing times and fluxes.
@@ -79,14 +80,13 @@ def interpolated_acf(times, fluxes, plots=False):
         Incomplete but otherwise uniformly sampled times
     fluxes : numpy.ndarray
         Flux for each time in ``times``
-    plots : bool (optional)
-        Plot the autocorrelation function
 
     Return
     ------
-    acf_period : float
-        Dominant period detected via the autocorrelation function,
-        in the same time unit as ``times``
+    lag : numpy.ndarray
+        Time lag
+    acf : numpy.ndarray
+        Autocorrelation function
     """
     if not np.all(np.sort(times) == times):
         raise ValueError("Arrays must be in chronological order to compute ACF")
@@ -100,15 +100,33 @@ def interpolated_acf(times, fluxes, plots=False):
 
     # Compute the autocorrelation function on interpolated fluxes
     acf = autocorrelation(interpolated_fluxes)
+    return lag, acf
 
-    # Smooth the ACF, find period at maximum ACF peak
-    # ignoring the peak at zero-lag
+
+def dominant_period(lag, acf, plot=False):
+    """
+    Find the dominant period in the autocorrelation function.
+
+    Parameters
+    ----------
+    lag : numpy.ndarray
+        Time lags
+    acf : numpy.ndarray
+        Autocorrelation function
+    plot : bool (optional)
+        Plot the autocorrelation function, peak detected
+
+    Return
+    ------
+    acf_period : float
+        Dominant period detected via the autocorrelation function
+    """
     smooth_acf = gaussian_filter(acf, 10)
     relative_maxes = signal.argrelmax(smooth_acf)[0]
     absolute_max_index = relative_maxes[np.argmax(smooth_acf[relative_maxes])]
     acf_period = lag[absolute_max_index]
 
-    if plots:
+    if plot:
         import matplotlib.pyplot as plt
         plt.figure()
         plt.plot(lag, acf/np.max(acf), label='ACF')
