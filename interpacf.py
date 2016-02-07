@@ -103,7 +103,7 @@ def interpolated_acf(times, fluxes):
     return lag, acf
 
 
-def dominant_period(lag, acf, plot=False):
+def dominant_period(lag, acf, min=None, max=None, plot=False):
     """
     Find the dominant period in the autocorrelation function.
 
@@ -113,6 +113,10 @@ def dominant_period(lag, acf, plot=False):
         Time lags
     acf : numpy.ndarray
         Autocorrelation function
+    min : float (optional)
+        Return dominant period greater than or equal to ``min``
+    max : float (optional)
+        Return dominant period less than or equal to ``max``
     plot : bool (optional)
         Plot the autocorrelation function, peak detected
 
@@ -121,14 +125,28 @@ def dominant_period(lag, acf, plot=False):
     acf_period : float
         Dominant period detected via the autocorrelation function
     """
-    smooth_acf = gaussian_filter(acf, 10)
+    lag_limited = np.copy(lag)
+    acf_limited = np.copy(acf)
+
+    # Apply limits if any are input:
+    if min is not None and max is None:
+        acf_limited = acf_limited[lag_limited > min]
+        lag_limited = lag_limited[lag_limited > min]
+    elif max is not None and min is None:
+        acf_limited = acf_limited[lag_limited < max]
+        lag_limited = lag_limited[lag_limited < max]
+    elif max is not None and min is not None:
+        acf_limited = acf_limited[(lag_limited < max) & (lag_limited > min)]
+        lag_limited = lag_limited[(lag_limited < max) & (lag_limited > min)]
+
+    smooth_acf = gaussian_filter(acf_limited, 10)
     relative_maxes = signal.argrelmax(smooth_acf)[0]
     if len(relative_maxes) == 0:
-        raise ValueError("No period found. Did you median-subtract your "
-                         "fluxes?")
-    
+        raise ValueError("No period found. Be sure to check limits and to "
+                         "median-subtract your fluxes.")
+
     absolute_max_index = relative_maxes[np.argmax(smooth_acf[relative_maxes])]
-    acf_period = lag[absolute_max_index]
+    acf_period = lag_limited[absolute_max_index]
 
     if plot:
         import matplotlib.pyplot as plt
