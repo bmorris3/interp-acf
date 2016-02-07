@@ -10,8 +10,6 @@ import numpy as np
 
 __all__ = ["interpolated_acf", "autocorrelation", "interpolate_missing_data",
            "dominant_period"]
-__version__ = "0.1"
-__author__ = "Brett Morris (bmmorris@uw.edu)"
 
 
 def interpolate_missing_data(times, fluxes):
