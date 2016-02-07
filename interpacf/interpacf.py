@@ -112,9 +112,9 @@ def dominant_period(lag, acf, min=None, max=None, plot=False):
     acf : numpy.ndarray
         Autocorrelation function
     min : float (optional)
-        Return dominant period greater than or equal to ``min``
+        Return dominant period greater than ``min``
     max : float (optional)
-        Return dominant period less than or equal to ``max``
+        Return dominant period less than ``max``
     plot : bool (optional)
         Plot the autocorrelation function, peak detected
 
