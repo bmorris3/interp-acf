@@ -16,7 +16,7 @@ python setup.py install
 For time series (`times_incomplete`, `fluxes_incomplete`) with missing data, 
 compute the autocorrelation function after interpolating over missing data, and
 identify the dominant period in that autocorrelation function: 
-```
+```python
 from interpacf import interpolated_acf, dominant_period
 lag, acf = interpolated_acf(times_incomplete, fluxes_incomplete)
 period = dominant_period(lag, acf, plot=True)
