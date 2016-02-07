@@ -21,6 +21,7 @@ from interpacf import interpolated_acf, dominant_period
 lag, acf = interpolated_acf(times_incomplete, fluxes_incomplete)
 period = dominant_period(lag, acf)
 ```
+![](http://staff.washington.edu/bmmorris/images/acf.png)
 
 #### Dependencies
 * python 2/3
