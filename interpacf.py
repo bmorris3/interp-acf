@@ -123,6 +123,10 @@ def dominant_period(lag, acf, plot=False):
     """
     smooth_acf = gaussian_filter(acf, 10)
     relative_maxes = signal.argrelmax(smooth_acf)[0]
+    if len(relative_maxes) == 0:
+        raise ValueError("No period found. Did you median-subtract your "
+                         "fluxes?")
+    
     absolute_max_index = relative_maxes[np.argmax(smooth_acf[relative_maxes])]
     acf_period = lag[absolute_max_index]
 
