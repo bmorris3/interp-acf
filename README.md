@@ -19,7 +19,7 @@ identify the dominant period in that autocorrelation function:
 ```
 from interpacf import interpolated_acf, dominant_period
 lag, acf = interpolated_acf(times_incomplete, fluxes_incomplete)
-period = dominant_period(lag, acf)
+period = dominant_period(lag, acf, plot=True)
 ```
 ![](http://staff.washington.edu/bmmorris/images/acf.png)
 
