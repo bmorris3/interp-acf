@@ -15,7 +15,9 @@ python setup.py install
 
 For time series (`times_incomplete`, `fluxes_incomplete`) with missing data, 
 compute the autocorrelation function after interpolating over missing data, and
-identify the dominant period in that autocorrelation function: 
+identify the dominant period in the smoothed autocorrelation function (after 
+smoothing according to the recommendations of 
+[McQuillan, Aigrain & Mazeh (2013)](http://adsabs.harvard.edu/abs/2013MNRAS.432.1203M)): 
 ```python
 from interpacf import interpolated_acf, dominant_period
 
