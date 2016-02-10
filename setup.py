@@ -15,7 +15,7 @@ setup(
     author="Brett Morris",
     author_email="bmmorris@uw.edu",
     url="https://github.com/bmorris3/interp-acf/",
-    py_modules=["interpacf"],
+    packages=["interpacf"],
     description="Take the autocorrelation function despite missing data.",
     long_description=open("README.md").read(),
     package_data={"": ["LICENSE"]},
