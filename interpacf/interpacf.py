@@ -7,9 +7,15 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy import signal
+import warnings
 
 __all__ = ["interpolated_acf", "autocorrelation", "interpolate_missing_data",
            "dominant_period"]
+
+
+class NoPeriodFoundWarning(Warning):
+    """Warning for when no periods can be found"""
+    pass
 
 
 def interpolate_missing_data(times, fluxes):
@@ -102,9 +108,11 @@ def interpolated_acf(times, fluxes):
 
 
 def dominant_period(lag, acf, min=None, max=None, fwhm=18, window=56,
-                    plot=False):
+                    plot=False, quiet=False):
     """
     Find the dominant period in the smoothed autocorrelation function.
+
+    If no dominant period is found, raise `NoPeakWarning` and return `numpy.nan`
 
     Parameters
     ----------
@@ -124,6 +132,8 @@ def dominant_period(lag, acf, min=None, max=None, fwhm=18, window=56,
         is 56 lags, as in McQuillan, Aigrain & Mazeh (2013) [1]_
     plot : bool (optional)
         Plot the autocorrelation function, peak detected. Default is `False`.
+    quiet : bool (optional)
+        Don't raise warning if no period is found. Default is `False`.
 
     Return
     ------
@@ -156,8 +166,11 @@ def dominant_period(lag, acf, min=None, max=None, fwhm=18, window=56,
     # Detect peaks
     relative_maxes = signal.argrelmax(smooth_acf)[0]
     if len(relative_maxes) == 0:
-        raise ValueError("No period found. Be sure to check limits and to "
-                         "median-subtract your fluxes.")
+        if not quiet:
+            warnmsg = ("No period found. Be sure to check limits and to "
+                       "median-subtract your fluxes.")
+            warnings.warn(warnmsg, NoPeriodFoundWarning)
+        return np.nan
 
     # Detect highest peak
     absolute_max_index = relative_maxes[np.argmax(smooth_acf[relative_maxes])]
