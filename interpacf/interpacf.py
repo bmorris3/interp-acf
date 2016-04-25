@@ -18,10 +18,12 @@ class NoPeriodFoundWarning(Warning):
     pass
 
 
-def interpolate_missing_data(times, fluxes):
+def interpolate_missing_data(times, fluxes, cadences=None):
     """
     Assuming ``times`` are uniformly spaced with missing cadences,
     fill in the missing cadences with linear interpolation.
+
+    Cadences can be passed if they are known.
 
     Parameters
     ----------
@@ -29,6 +31,8 @@ def interpolate_missing_data(times, fluxes):
         Incomplete but otherwise uniformly sampled times
     fluxes : numpy.ndarray
         Flux for each time in ``times``
+    cadences : numpy.ndarray, optional
+        Integer cadence number of each observation.
 
     Returns
     -------
@@ -37,13 +41,20 @@ def interpolate_missing_data(times, fluxes):
     interpolated_fluxes : numpy.ndarray
         ``fluxes`` with filled-in missing cadences
     """
-    # Find typical time between cadences:
-    dt = np.median(np.diff(times))
     first_time = times[0]
 
-    # Approximate the patchy grid of integer cadence indices,
-    # i.e.: (0, 1, 3, 4, 5, 8, ...)
-    cadence_indices = np.rint((times - first_time)/dt)
+    if cadences is not None:
+        # Time between cadences
+        dt = np.median(np.diff(times))#(times[1] - times[0]) / (cadences[1] - cadences[0])
+        # Ensure that user provided cadence indices are ints
+        cadence_indices = (cadences - cadences[0]).astype(int)
+    else:
+        # Find typical time between cadences:
+        dt = np.median(np.diff(times))
+        # Approximate the patchy grid of integer cadence indices,
+        # i.e.: (0, 1, 3, 4, 5, 8, ...)
+        cadence_indices = np.rint((times - first_time)/dt)
+
     # Find missing cadence indices if that grid were complete
     expected_cadence_indices = set(np.arange(cadence_indices.min(),
                                              cadence_indices.max()))
@@ -73,7 +84,7 @@ def autocorrelation(x):
     return result[result.size//2:]
 
 
-def interpolated_acf(times, fluxes):
+def interpolated_acf(times, fluxes, cadences=None):
     """
     Calculate the autocorrelation function after interpolating over
     missing times and fluxes.
@@ -84,6 +95,8 @@ def interpolated_acf(times, fluxes):
         Incomplete but otherwise uniformly sampled times
     fluxes : numpy.ndarray
         Flux for each time in ``times``
+    cadences : numpy.ndarray, optional
+        Integer cadence number of each observation.
 
     Return
     ------
@@ -97,7 +110,8 @@ def interpolated_acf(times, fluxes):
 
     # Interpolate over missing times, fluxes
     interpolated_times, interpolated_fluxes = interpolate_missing_data(times,
-                                                                       fluxes)
+                                                                       fluxes,
+                                                                       cadences)
     # Calculate the grid of "lags" in units of ``times``
     dt = np.median(np.diff(interpolated_times))
     lag = dt*np.arange(len(interpolated_fluxes))
