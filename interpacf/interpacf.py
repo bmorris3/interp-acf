@@ -44,10 +44,9 @@ def interpolate_missing_data(times, fluxes, cadences=None):
     first_time = times[0]
 
     if cadences is not None:
-        # Time between cadences
-        dt = np.median(np.diff(times))#(times[1] - times[0]) / (cadences[1] - cadences[0])
-        # Ensure that user provided cadence indices are ints
-        cadence_indices = (cadences - cadences[0]).astype(int)
+        # Median time between cadences
+        dt = np.median(np.diff(times) / np.diff(cadences))
+        cadence_indices = cadences - cadences[0]
     else:
         # Find typical time between cadences:
         dt = np.median(np.diff(times))
