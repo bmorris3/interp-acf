@@ -35,9 +35,4 @@ def test_periods(n_points_missing):
     # Find dominant period in autocorrelation function
     detected_period = dominant_period(lag, acf, plot=True)
 
-    print("Actual dominant period: {0:.3f}\nDetected dominant period: "
-          "{1:.3f}\nDifference: {2:.3f}%"
-          .format(primary_period, detected_period,
-                  (primary_period - detected_period)/primary_period))
-
     assert ((primary_period - detected_period)/primary_period) < 0.02
