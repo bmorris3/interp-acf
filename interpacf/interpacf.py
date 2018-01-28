@@ -194,7 +194,7 @@ def dominant_period(lag, acf, min=None, max=None, fwhm=18, window=56,
         plt.figure()
         plt.plot(lag, acf/np.max(acf), label='ACF')
         plt.plot(lag_limited, smooth_acf/np.max(smooth_acf),
-                 label='Smoothed ACF')
+                 label='Smoothed ACF', ls='--')
         plt.axvline(acf_period, ls='--', color='r', label='Primary period')
         plt.legend()
         plt.title('ACF')
