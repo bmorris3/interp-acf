@@ -191,13 +191,17 @@ def dominant_period(lag, acf, min=None, max=None, fwhm=18, window=56,
 
     if plot:
         import matplotlib.pyplot as plt
-        plt.figure()
-        plt.plot(lag, acf/np.max(acf), label='ACF')
-        plt.plot(lag_limited, smooth_acf/np.max(smooth_acf),
-                 label='Smoothed ACF', ls='--')
-        plt.axvline(acf_period, ls='--', color='r', label='Primary period')
-        plt.legend()
-        plt.title('ACF')
-        plt.xlabel('Lag')
+        fig, ax = plt.subplots()
+        ax.plot(lag, acf/np.max(acf), label='ACF', color='k', lw=2)
+        ax.plot(lag_limited, smooth_acf/np.max(smooth_acf),
+                label='Smoothed ACF', ls='--', color='r')
+        ax.axvline(acf_period, ls='--', color='DodgerBlue',
+                   label='Primary period')
+        ax.legend()
+        ax.set_title('ACF')
+        ax.set_xlabel('Lag')
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.grid(ls=':')
 
     return acf_period
