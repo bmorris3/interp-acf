@@ -1,4 +1,7 @@
 # interp-acf
+
+[![Build Status](https://travis-ci.org/bmorris3/interp-acf.svg?branch=master)](https://travis-ci.org/bmorris3/interp-acf)
+
 Calculate the autocorrelation function for an evenly sampled time-series with 
 missing data.
 
@@ -7,6 +10,10 @@ Clone this repository, change directories into it, and run this command to
 install the package: 
 ```
 python setup.py install
+```
+You can run the tests locally with
+```
+python setup.py test
 ```
 
 ### Example
@@ -25,6 +32,8 @@ lag, acf = interpolated_acf(times_incomplete, fluxes_incomplete)
 period = dominant_period(lag, acf, plot=True)
 ```
 ![](http://staff.washington.edu/bmmorris/images/acf.png)
+
+For the full example code, see [`example.ipynb`](https://github.com/bmorris3/interp-acf/blob/master/example.ipynb)
 
 #### Dependencies
 * python 2/3
