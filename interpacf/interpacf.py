@@ -18,6 +18,11 @@ class NoPeriodFoundWarning(Warning):
     pass
 
 
+class NonzeroMedianWarning(Warning):
+    """Warning for when the fluxes haven't been normalized"""
+    pass
+
+
 def interpolate_missing_data(times, fluxes, cadences=None):
     """
     Assuming ``times`` are uniformly spaced with missing cadences,
@@ -106,6 +111,11 @@ def interpolated_acf(times, fluxes, cadences=None):
     """
     if not np.all(np.sort(times) == times):
         raise ValueError("Arrays must be in chronological order to compute ACF")
+
+    if not np.abs(np.median(fluxes)/np.max(fluxes) < 0.01):
+        warnmessage = ("Have you normalized your fluxes so that their median is"
+                       " near zero?")
+        warnings.warn(warnmessage, NonzeroMedianWarning)
 
     # Interpolate over missing times, fluxes
     interpolated_times, interpolated_fluxes = interpolate_missing_data(times,
