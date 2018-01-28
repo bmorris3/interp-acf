@@ -16,10 +16,12 @@ setup(
     author_email="bmmorris@uw.edu",
     url="https://github.com/bmorris3/interp-acf/",
     packages=["interpacf"],
-    description="Take the autocorrelation function despite missing data.",
+    description="Take the autocorrelation function of some data, interpolating over missing data.",
     long_description=open("README.md").read(),
     package_data={"": ["LICENSE"]},
     include_package_data=True,
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
     classifiers=[
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
