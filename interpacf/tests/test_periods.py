@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from ..interpacf import interpolated_acf, dominant_period
 
 @pytest.mark.parametrize("n_points_missing",
                          [(i) for i in np.linspace(100, 300, 10, dtype=int)])
@@ -24,8 +25,6 @@ def test_periods(n_points_missing):
     times_incomplete = all_times[mask]
     fluxes_incomplete = all_fluxes[mask]
 
-    from ..interpacf import interpolated_acf, dominant_period
-
     # Need zero-mean fluxes:
     fluxes_incomplete -= np.mean(fluxes_incomplete)
 
@@ -33,6 +32,6 @@ def test_periods(n_points_missing):
     lag, acf = interpolated_acf(times_incomplete, fluxes_incomplete)
 
     # Find dominant period in autocorrelation function
-    detected_period = dominant_period(lag, acf, plot=True)
+    detected_period = dominant_period(lag, acf)
 
     assert ((primary_period - detected_period)/primary_period) < 0.02
