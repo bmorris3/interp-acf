@@ -33,7 +33,9 @@ period = dominant_period(lag, acf, plot=True)
 ```
 ![](http://staff.washington.edu/bmmorris/images/acf.png)
 
-For the full example code, see [`example.ipynb`](https://github.com/bmorris3/interp-acf/blob/master/example.ipynb)
+### Detailed example:
+
+For a full example code, see [`example.ipynb`](https://github.com/bmorris3/interp-acf/blob/master/example.ipynb)
 
 #### Dependencies
 * python 2/3
